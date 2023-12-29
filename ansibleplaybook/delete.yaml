@@ -1,0 +1,34 @@
+- name: kube server deployment
+  hosts: 192.168.1.32
+  become: true
+  remote_user: kmaster
+  tasks:
+    - name: Delete Kubernetes mysql pod resources
+      command: kubectl delete -f /home/kmaster/k8_msydevops_php/mysql_pod.yaml
+      become_user: kmaster
+      ignore_errors: yes
+
+    - name: Delete Kubernetes phpmyadmin pod resources
+      command: kubectl delete -f /home/kmaster/k8_msydevops_php/phpmyadmin.yaml
+      become_user: kmaster
+      ignore_errors: yes
+
+    - name: Delete Kubernetes apache pod resources
+      command: kubectl delete -f /home/kmaster/k8_msydevops_php/apache.yaml
+      become_user: kmaster
+      ignore_errors: yes
+    
+    - name: Delete Kubernetes configmap resources
+      command: kubectl delete configmap demo-config
+      become_user: kmaster
+      ignore_errors: yes
+
+    - name: Delete Kubernetes secrets resources
+      command: kubectl delete -f /home/kmaster/k8_msydevops_php/secrets_mysql.yaml
+      become_user: kmaster
+      ignore_errors: yes
+    
+    - name: Delete Kubernetes pv resources
+      command: kubectl delete -f /home/kmaster/k8_msydevops_php/pv_mysql.yaml
+      become_user: kmaster
+      ignore_errors: yes
