@@ -1,0 +1,113 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Git checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mohankumar130/msydevops_phpapp.git'
+            }
+        }
+        stage('connection check ansibel server') {
+            steps {
+                sshagent(['ansible-server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 hostname'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 rm -rf msydevops_php'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 rm -rf playbook_$JOB_NAME'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 mkdir playbook_$JOB_NAME'                   
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 mkdir msydevops_php'                   
+                }
+            }
+        }
+        stage('file move jenkins to ansible server') {
+            steps {
+                sshagent(['ansible-server']) {
+                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/Dockerfile ansible@192.168.1.35:/home/ansible/msydevops_php'
+                    sh 'scp -r /var/lib/jenkins/workspace/msydevops_php/src ansible@192.168.1.35:/home/ansible/msydevops_php'
+                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/ansibleplaybook/* ansible@192.168.1.35:/home/ansible/playbook_$JOB_NAME'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ls /home/ansible/msydevops_php'
+                }
+            }
+        }
+        stage('build docker image from dockerfile') {
+            steps {
+                sshagent(['ansible-server']) {
+                    // sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 cd /home/ansible'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image build -t $JOB_NAME:v1.$BUILD_ID php-application'
+                    // sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker run -it -d $JOB_NAME:v1.$BUILD_ID'
+                }
+            }
+        }
+        stage('tagging docker image') {
+            steps {
+                sshagent(['ansible-server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image tag $JOB_NAME:v1.$BUILD_ID msy061618/$JOB_NAME:v1.$BUILD_ID'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image tag $JOB_NAME:v1.$BUILD_ID msy061618/$JOB_NAME:latest'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker images'
+                }
+            }
+        }
+        stage('docker hub registry login') {
+            steps {
+                sshagent(['ansible-server']) {
+                    withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                      sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker login -u msy061618 -p ${dockerhub}'  
+                    }
+                }
+            }
+        }
+        stage('image push to docker hub') {
+            steps {
+                sshagent(['ansible-server']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker push msy061618/$JOB_NAME:v1.$BUILD_ID'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker push msy061618/$JOB_NAME:latest'
+
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image rm msy061618/$JOB_NAME:v1.$BUILD_ID msy061618/$JOB_NAME:latest $JOB_NAME:v1.$BUILD_ID'
+                }
+            }
+        }
+        stage('connecting k8 server') {
+            steps {
+                sshagent(['kmaster']) {
+                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 kubectl get no'
+                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 rm -rf k8_$JOB_NAME'
+                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 mkdir k8_$JOB_NAME'
+                }
+            }
+        }
+        stage('deployment file send to k8master-node') {
+            steps {
+                sshagent(['kmaster']) {
+                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/php_project/* kmaster@192.168.1.32:/home/kmaster/k8_$JOB_NAME'
+                }
+            }
+        }
+        stage('delete existing resource in kubernetees') {
+            steps {
+                sshagent(['ansible-server']) {
+                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ansible-playbook playbook_$JOB_NAME/ans_delete.yaml'
+                }
+            }
+        }
+        stage('check pod status') {
+            steps {
+                sshagent(['kmaster']) {
+                     sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 kubectl get all'
+                }
+            }
+        }
+        stage('Create resource in kubernetees') {
+            steps {
+                sshagent(['ansible-server']) {
+                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ansible-playbook playbook_$JOB_NAME/ans_create.yaml'
+                }
+            }
+        }
+        stage('check pod status2') {
+            steps {
+                sshagent(['kmaster']) {
+                     sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 kubectl get all'
+                }
+            }
+        }
+    }
+}
