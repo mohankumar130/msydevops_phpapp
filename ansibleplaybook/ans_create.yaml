@@ -8,22 +8,22 @@
       become_user: kmaster
 
     - name: create Kubernetes pv resources
-      command: kubectl delete -f /home/kmaster/k8_msydevops_php/pv_mysql.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/pv_mysql.yaml
       become_user: kmaster
 
     - name: create Kubernetes secrets resources
-      command: kubectl delete -f /home/kmaster/k8_msydevops_php/secrets_mysql.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/secrets_mysql.yaml
       become_user: kmaster
       
     - name: create Kubernetes mysql pod resources
-      command: kubectl delete -f /home/kmaster/k8_msydevops_php/mysql_pod.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/mysql_pod.yaml
       become_user: kmaster
       
     - name: create Kubernetes phpmyadmin pod resources
-      command: kubectl delete -f /home/kmaster/k8_msydevops_php/phpmyadmin.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/phpmyadmin.yaml
       become_user: kmaster
       
     - name: create Kubernetes apache pod resources
-      command: kubectl delete -f /home/kmaster/k8_msydevops_php/apache.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/apache.yaml
       become_user: kmaster
       
