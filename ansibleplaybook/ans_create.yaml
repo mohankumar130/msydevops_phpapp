@@ -1,4 +1,4 @@
-- name: kube server deployment
+- name: kube servers deployment
   hosts: 192.168.1.32
   become: true
   remote_user: kmaster
