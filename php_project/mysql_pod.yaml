@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-app
+  template:
+    metadata:
+      labels:
+        app: mysql-app
+    spec:
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-nfs-pvc
+      - name: mysql-initdb
+        configMap:
+          name: demo-config          
+      containers:
+      - name: mysql
+        image: mysql:latest
+        envFrom:
+        - secretRef:
+            name: mysql-secrets
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1024Mi
+          limits:
+            cpu: 400m
+            memory: 2048Mi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql-app
+  ports:
+    - port: 3306

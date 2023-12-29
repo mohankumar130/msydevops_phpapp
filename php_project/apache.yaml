@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      volumes:
+      - name: apache-persistent-storage
+        persistentVolumeClaim:
+          claimName: apache-nfs-pvc
+      containers:
+      - name: php-apache
+        image: mohankumar130/
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: apache-persistent-storage
+          mountPath: /var/www/html
+        resources:
+          requests:
+            cpu: 50m
+            memory: 512Mi
+          limits:
+            cpu: 200m
+            memory: 1024Mi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache-service
+spec:
+  selector:
+    app: php-apache
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
