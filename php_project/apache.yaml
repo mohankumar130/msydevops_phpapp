@@ -18,7 +18,7 @@ spec:
           claimName: apache-nfs-pvc
       containers:
       - name: php-apache
-        image: mohankumar130/
+        image: msy061618/msydevops_php
         ports:
         - containerPort: 80
         volumeMounts:
