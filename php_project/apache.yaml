@@ -12,18 +12,11 @@ spec:
       labels:
         app: php-apache
     spec:
-      volumes:
-      - name: apache-persistent-storage
-        persistentVolumeClaim:
-          claimName: apache-nfs-pvc
       containers:
       - name: php-apache
         image: msy061618/msydevops_php
         ports:
         - containerPort: 80
-        volumeMounts:
-        - name: apache-persistent-storage
-          mountPath: /var/www/html
         resources:
           requests:
             cpu: 50m
