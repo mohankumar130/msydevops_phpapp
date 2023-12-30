@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: php-apache
-        image: msy061618/php_apache:v1
+        image: msy061618/msydevops_php
         ports:
         - containerPort: 80
         volumeMounts:
@@ -23,7 +23,8 @@ spec:
       volumes:
       - name: apache-persistent-storage
         persistentVolumeClaim:
-          claimName: apache-nfs-pvc          
+          claimName: apache-nfs-pvc
+                
 ---
 apiVersion: v1
 kind: Service
