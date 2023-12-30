@@ -18,7 +18,7 @@ spec:
           claimName: mysql-nfs-pvc
       - name: mysql-initdb
         configMap:
-          name: demo-config          
+          name: sqlfile-config          
       containers:
       - name: mysql
         image: mysql:latest

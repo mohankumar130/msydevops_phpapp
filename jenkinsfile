@@ -22,7 +22,6 @@ pipeline {
             steps {
                 sshagent(['ansible-server']) {
                     sh 'scp /var/lib/jenkins/workspace/msydevops_php/Dockerfile ansible@192.168.1.35:/home/ansible/msydevops_php'
-                    sh 'scp -r /var/lib/jenkins/workspace/msydevops_php/src ansible@192.168.1.35:/home/ansible/msydevops_php'
                     sh 'scp /var/lib/jenkins/workspace/msydevops_php/ansibleplaybook/* ansible@192.168.1.35:/home/ansible/playbook_$JOB_NAME'
                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ls /home/ansible/msydevops_php'
                 }
@@ -77,7 +76,7 @@ pipeline {
         stage('deployment file send to k8master-node') {
             steps {
                 sshagent(['kmaster']) {
-                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/php_project/* kmaster@192.168.1.32:/home/kmaster/k8_$JOB_NAME'
+                    sh 'scp /var/lib/jenkins/workspace/$JOB_NAME/kubernetes_file/* kmaster@192.168.1.32:/home/kmaster/k8_$JOB_NAME'
                 }
             }
         }
