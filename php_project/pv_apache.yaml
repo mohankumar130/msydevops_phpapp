@@ -1,27 +1,27 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-nfs-pv
+  name: apache-nfs-pv
 spec:
   capacity:
-    storage: 2Gi
+    storage: 3Gi
   volumeMode: Filesystem
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: mysql-nfs
+  storageClassName: apache-nfs
   mountOptions:
     - nfsvers=4.1
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.1.31
-    path: /nfsdrive/mysql # Replace with your NFS share path
+    server: 192.168.1.31   
+    path: /nfsdrive/apache_crud # Replace with your NFS share path
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-nfs-pvc
+  name: apache-nfs-pvc
 spec:
-  storageClassName: mysql-nfs
+  storageClassName: apache-nfs
   accessModes:
     - ReadWriteMany
   resources:

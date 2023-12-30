@@ -14,16 +14,16 @@ spec:
     spec:
       containers:
       - name: php-apache
-        image: msy061618/msydevops_php
+        image: msy061618/php_apache:v1
         ports:
         - containerPort: 80
-        resources:
-          requests:
-            cpu: 50m
-            memory: 512Mi
-          limits:
-            cpu: 200m
-            memory: 1024Mi  
+        volumeMounts:
+        - name: apache-persistent-storage
+          mountPath: /var/www/html      
+      volumes:
+      - name: apache-persistent-storage
+        persistentVolumeClaim:
+          claimName: apache-nfs-pvc          
 ---
 apiVersion: v1
 kind: Service
