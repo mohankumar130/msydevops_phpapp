@@ -17,13 +17,6 @@ spec:
         image: msy061618/msy_devops_php_app:latest
         ports:
         - containerPort: 80
-        volumeMounts:
-        - name: apache-persistent-storage
-          mountPath: /var/www/html      
-      volumes:
-      - name: apache-persistent-storage
-        persistentVolumeClaim:
-          claimName: apache-nfs-pvc
                 
 ---
 apiVersion: v1

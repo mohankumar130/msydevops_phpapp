@@ -11,9 +11,9 @@
       command: kubectl apply -f /home/kmaster/deploy_files/pv_mysql.yaml
       become_user: kmaster
     
-    - name: create Kubernetes pv_apache resources
-      command: kubectl apply -f /home/kmaster/deploy_files/pv_apache.yaml
-      become_user: kmaster
+    # - name: create Kubernetes pv_apache resources
+    #   command: kubectl apply -f /home/kmaster/deploy_files/pv_apache.yaml
+    #   become_user: kmaster
 
     - name: create Kubernetes secrets resources
       command: kubectl apply -f /home/kmaster/deploy_files/secrets_mysql.yaml

@@ -33,7 +33,7 @@
       become_user: kmaster
       ignore_errors: yes
     
-    - name: Delete Kubernetes pv_apache resources
-      command: kubectl delete -f /home/kmaster/deploy_files/pv_apache.yaml
-      become_user: kmaster
-      ignore_errors: yes
+    # - name: Delete Kubernetes pv_apache resources
+    #   command: kubectl delete -f /home/kmaster/deploy_files/pv_apache.yaml
+    #   become_user: kmaster
+    #   ignore_errors: yes
