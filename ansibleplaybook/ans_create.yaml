@@ -4,7 +4,7 @@
   remote_user: kmaster
   tasks:
     - name: create resources
-      command: kubectl create configmap demo-config --from-file=/home/kmaster/k8_msydevops_php/pv_mysql.yaml
+      command: kubectl create configmap demo-config --from-file=/home/kmaster/k8_msydevops_php/demodb.sql
       become_user: kmaster
 
     - name: create Kubernetes pv resources
