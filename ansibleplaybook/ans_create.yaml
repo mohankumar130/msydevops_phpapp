@@ -4,30 +4,30 @@
   remote_user: kmaster
   tasks:
     - name: create resources
-      command: kubectl create configmap sqlfile-config --from-file=/home/kmaster/k8_msydevops_php/demodb.sql
+      command: kubectl create configmap sqlfile-config --from-file=/home/kmaster/deploy_files/demodb.sql
       become_user: kmaster
 
     - name: create Kubernetes pv_mysql resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/pv_mysql.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/pv_mysql.yaml
       become_user: kmaster
     
     - name: create Kubernetes pv_apache resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/pv_apache.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/pv_apache.yaml
       become_user: kmaster
 
     - name: create Kubernetes secrets resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/secrets_mysql.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/secrets_mysql.yaml
       become_user: kmaster
       
     - name: create Kubernetes mysql pod resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/app_mysql_pod.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/app_mysql_pod.yaml
       become_user: kmaster
       
     - name: create Kubernetes phpmyadmin pod resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/app_php_myadmin.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/app_php_myadmin.yaml
       become_user: kmaster
       
     - name: create Kubernetes apache pod resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/app_php_apache.yaml
+      command: kubectl apply -f /home/kmaster/deploy_files/app_php_apache.yaml
       become_user: kmaster
       

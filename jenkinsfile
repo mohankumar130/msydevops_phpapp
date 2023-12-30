@@ -11,19 +11,20 @@ pipeline {
             steps {
                 sshagent(['ansible-server']) {
                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 hostname'
-                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 rm -rf msydevops_php'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 rm -rf dockerbuild_$JOB_NAME'
                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 rm -rf playbook_$JOB_NAME'
                     sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 mkdir playbook_$JOB_NAME'                   
-                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 mkdir msydevops_php'                   
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 mkdir dockerbuild_$JOB_NAME'                   
                 }
             }
         }
         stage('file move jenkins to ansible server') {
             steps {
                 sshagent(['ansible-server']) {
-                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/Dockerfile ansible@192.168.1.35:/home/ansible/msydevops_php'
-                    sh 'scp /var/lib/jenkins/workspace/msydevops_php/ansibleplaybook/* ansible@192.168.1.35:/home/ansible/playbook_$JOB_NAME'
-                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ls /home/ansible/msydevops_php'
+                    sh 'scp /var/lib/jenkins/workspace/$JOB_NAME/Dockerfile ansible@192.168.1.35:/home/ansible/dockerbuild_$JOB_NAME'
+                    sh 'scp -r /var/lib/jenkins/workspace/$JOB_NAME/php_crud ansible@192.168.1.35:/home/ansible/dockerbuild_$JOB_NAME'
+                    sh 'scp /var/lib/jenkins/workspace/$JOB_NAME/ansibleplaybook/* ansible@192.168.1.35:/home/ansible/playbook_$JOB_NAME'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 ls /home/ansible/dockerbuild_$JOB_NAME'
                 }
             }
         }
@@ -31,7 +32,7 @@ pipeline {
             steps {
                 sshagent(['ansible-server']) {
                     // sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 cd /home/ansible'
-                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image build -t $JOB_NAME:v1.$BUILD_ID php-application'
+                    sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker image build -t $JOB_NAME:v1.$BUILD_ID dockerbuild_$JOB_NAME'
                     // sh 'ssh -o StrictHostKeyChecking=no ansible@192.168.1.35 docker run -it -d $JOB_NAME:v1.$BUILD_ID'
                 }
             }
@@ -68,15 +69,15 @@ pipeline {
             steps {
                 sshagent(['kmaster']) {
                     sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 kubectl get no'
-                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 rm -rf k8_$JOB_NAME'
-                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 mkdir k8_$JOB_NAME'
+                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 rm -rf deploy_files'
+                    sh 'ssh -o StrictHostKeyChecking=no kmaster@192.168.1.32 mkdir deploy_files'
                 }
             }
         }
         stage('deployment file send to k8master-node') {
             steps {
                 sshagent(['kmaster']) {
-                    sh 'scp /var/lib/jenkins/workspace/$JOB_NAME/kubernetes_file/* kmaster@192.168.1.32:/home/kmaster/k8_$JOB_NAME'
+                    sh 'scp /var/lib/jenkins/workspace/$JOB_NAME/kubernetes_file/* kmaster@192.168.1.32:/home/kmaster/deploy_files'
                 }
             }
         }
