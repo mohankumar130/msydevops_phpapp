@@ -24,7 +24,7 @@
       become_user: kmaster
       
     - name: create Kubernetes phpmyadmin pod resources
-      command: kubectl apply -f /home/kmaster/k8_msydevops_php/kubernetes_file/app_php_myadmin.yaml
+      command: kubectl apply -f /home/kmaster/k8_msydevops_php/app_php_myadmin.yaml
       become_user: kmaster
       
     - name: create Kubernetes apache pod resources
