@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: php-apache
-        image: msy061618/msy_devops_php_app
+        image: msy061618/msy_devops_php_app:latest
         ports:
         - containerPort: 80
         volumeMounts:
